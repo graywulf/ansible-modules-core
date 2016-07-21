@@ -63,7 +63,7 @@ options:
     version_added: 2.1
   guest:
     description:
-      - The virtual server name you wish to manage.
+      - The virtual server name or UUID you wish to manage.
     required: true
   username:
     description:
@@ -1779,7 +1779,13 @@ def main():
 
     # Check if the VM exists before continuing
     try:
-        vm = viserver.get_vm_by_name(guest)
+        vm_paths = viserver.get_registered_vms(
+            advanced_filters={'config.uuid': guest}
+        )
+        if vm_paths:
+            vm = viserver.get_vm_by_path(vm_paths[0])
+        else:
+            vm = viserver.get_vm_by_name(guest)
     except Exception:
         pass
 
